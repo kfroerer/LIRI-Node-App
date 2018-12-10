@@ -1,4 +1,5 @@
 require("dotenv").config();
+var fs = require("fs");
 var axios = require("axios");
 var keys = require("./keys.js");
 var moment = require("moment");
@@ -80,7 +81,33 @@ function spotifyThis (searchTerm){
         }
     )
 }
+// function runNode(textFileCommand, textFileSearch){
+//     console.log("node liri.js" + " " + textFileCommand + " " + textFileSearch)
+// }
+function readRandom (){
+    fs.readFile("random.txt", "utf8", function(error, data){
+        if (error){
+            return console.log (error);
+        }
+        // console.log(data)
+        var contentArr = data.split(",");
+        // console.log(contentArr[1]);
+        var searchCommand = contentArr[0];
+        var searchQuery = contentArr[1];
 
+        if (searchCommand = "spotify-this-song"){
+            spotifyThis(searchQuery);
+        }
+        if (searchCommand = "movie-this"){
+            movieThis(searchQuery);
+        }
+        if (searchCommand === "concert-this"){
+            concertThis(searchQuery)
+        }
+        // runNode(searchCommand, searchQuery);
+        //need to pull [0] and [1] from array and pass that through node function
+    })
+}
 
 switch(search){
     case "concert-this":
@@ -92,6 +119,10 @@ switch(search){
     case "spotify-this-song":
         spotifyThis(searchInput);
         break;
+    case "do-what-it-says":
+        readRandom();
+        break;
+
     default:
         console.log("default")
 };

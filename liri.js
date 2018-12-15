@@ -8,17 +8,19 @@ var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
 var nodeArgs = process.argv
 var search = process.argv[2];
-var searchInput = "";
+var searchInput = nodeArgs.slice(3).join("+");
+
+
 
 //loop that checks for search terms longer than one word
-for (var i = 3; i < nodeArgs.length; i++) {
-    if (i > 3 && i < nodeArgs.length) {
-        searchInput = searchInput + "+" + nodeArgs[i];
-    }
-    else {
-        searchInput += nodeArgs[i];
-    }
-};
+// for (var i = 3; i < nodeArgs.length; i++) {
+//     if (i > 3 && i < nodeArgs.length) {
+//         searchInput = searchInput + "+" + nodeArgs[i];
+//     }
+//     else {
+//         searchInput += nodeArgs[i];
+//     }
+// };
 // not working properly... need to pass through several things... not sure how
 function append(text) {
     fs.appendFile("log.txt", text, function (err) {
@@ -69,24 +71,26 @@ function concertThis(searchTerm) {
 };
 
 function movieThis(searchTerm) {
-    var movieQueryURL = "http://www.omdbapi.com/?t=" + searchTerm + "&y=&plot=short&apikey=trilogy";
-    axios.get(movieQueryURL).then(
-        function (response) {
-            var movie = response.data
-            console.log(
-                "Title: " + movie.Title + "\n" +
-                "Year: " + movie.Year + "\n" +
-                "Imdb Rating: " + movie.imdbRating + "\n" +
-                "Rotten Tomatoes Rating: " + movie.Ratings[1] + "\n" +
-                "Country: " + movie.Country + "\n" +
-                "Language: " + movie.Language + "\n" +
-                "Plot: " + movie.Plot + "\n" +
-                "Actors: " + movie.Actors);
-        }
-        //following will run if no search term is entered        
-    ).catch(
-        function () {
-            axios.get("http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy")
+    if (searchTerm.length > 0) {
+        var movieQueryURL = "http://www.omdbapi.com/?t=" + searchTerm + "&y=&plot=short&apikey=trilogy";
+        axios.get(movieQueryURL).then(
+            function (response) {
+                var movie = response.data
+                console.log(
+                    "Title: " + movie.Title + "\n" +
+                    "Year: " + movie.Year + "\n" +
+                    "Imdb Rating: " + movie.imdbRating + "\n" +
+                    "Rotten Tomatoes Rating: " + movie.Ratings[1] + "\n" +
+                    "Country: " + movie.Country + "\n" +
+                    "Language: " + movie.Language + "\n" +
+                    "Plot: " + movie.Plot + "\n" +
+                    "Actors: " + movie.Actors);
+            }
+        
+        )}
+        else {       
+        //following will run if no search term is entered
+           axios.get("http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy")
                 .then(
                     function (response) {
                         var movie = response.data
@@ -102,8 +106,7 @@ function movieThis(searchTerm) {
                     }
                 )
         }
-    )
-};
+}
 
 function spotifyThis(searchTerm) {
     if (searchTerm.length > 0) {
@@ -111,7 +114,6 @@ function spotifyThis(searchTerm) {
             .search({ type: "track", query: searchTerm })
             .then(function (response) {
                 var returnObj = response.tracks.items;
-                console.log(returnObj[0].artists[0].name);
                 console.log(
                     returnObj[0].artists[0].name + "\n" +
                     returnObj[0].name + "\n" +
@@ -123,13 +125,12 @@ function spotifyThis(searchTerm) {
     else {
         spotify.request("https://api.spotify.com/v1/tracks/0hrBpAOgrt8RXigk83LLNE")
             .then(function (response) {
-                var returnObj = response.tracks;
-                console.log(returnObj[0].artists[0].name);
+                var returnObj = response.album.artists[0];
                 console.log(
-                    returnObj[0].artists[0].name + "\n" +
-                    returnObj[0].name + "\n" +
-                    returnObj[0].preview_url + "\n" +
-                    returnObj[0].album.name
+                     returnObj.name + "\n" +
+                    "The Sign" + "\n" + 
+                    response.album.name + "\n" +
+                    response.album.preview_url
                 );
             })
             .catch(function (error) {

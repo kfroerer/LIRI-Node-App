@@ -10,6 +10,24 @@ var nodeArgs = process.argv
 var search = process.argv[2];
 var searchInput = nodeArgs.slice(3).join("+");
 
+// not working properly... need to pass through several things... not sure how
+function append(text) {
+    fs.appendFile("log.txt", text, function (err) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("Content Added");
+        }
+    });
+
+}
+
+//have results go to an array, turn into string for each venue  
+// var string = Array.join(", ");
+// string + "\n";
+// fileappend(string)
+// then split on new lin
 
 function concertThis(searchTerm) {
     var concertArray = [];

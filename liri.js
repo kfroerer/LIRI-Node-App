@@ -11,35 +11,6 @@ var search = process.argv[2];
 var searchInput = nodeArgs.slice(3).join("+");
 
 
-
-//loop that checks for search terms longer than one word
-// for (var i = 3; i < nodeArgs.length; i++) {
-//     if (i > 3 && i < nodeArgs.length) {
-//         searchInput = searchInput + "+" + nodeArgs[i];
-//     }
-//     else {
-//         searchInput += nodeArgs[i];
-//     }
-// };
-// not working properly... need to pass through several things... not sure how
-function append(text) {
-    fs.appendFile("log.txt", text, function (err) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log("Content Added");
-        }
-    });
-
-}
-
-//have results go to an array, turn into string for each venue  
-// var string = Array.join(", ");
-// string + "\n";
-// fileappend(string)
-// then split on new lin
-
 function concertThis(searchTerm) {
     var concertArray = [];
     var artistQueryURL = "https://rest.bandsintown.com/artists/" + searchTerm + "/events?app_id=codingbootcamp";
@@ -48,19 +19,17 @@ function concertThis(searchTerm) {
             var searchResult = (response.data);
             //loop that logs every event listed
             for (var i = 0; i < searchResult.length; i++) {
-                // console.log(
-                var venue = searchResult[i].venue.name; 
-                var city =  searchResult[i].venue.city;
-                var region = searchResult[i].venue.region;
-                var date = moment(searchResult[i].datetime).format("MMM Do YY");
-            
-            concertArray.push(venue + ", " + city + ", " + region + ", " + date);
+                var concertData = [
+                    searchResult[i].venue.name  + ", " + 
+                    searchResult[i].venue.city  + ", " + 
+                    searchResult[i].venue.region  + ", " + 
+                    moment(searchResult[i].datetime).format("MMM Do YY")
+                ].join(', ');
+
+                concertArray.push(concertData);
             };
-            console.log(concertArray);
-            // var string = concertArray.join(", ");
-            // string + "\n"
-            append(concertArray);
-            // // append(searchResult[i].venue.name);
+           var finalLog = concertArray.join(", " + "\n");
+           console.log(finalLog);
         }
     ).catch(
         function (error) {
@@ -123,16 +92,16 @@ function spotifyThis(searchTerm) {
             })
     }
     else {
-        spotify.request("https://api.spotify.com/v1/tracks/0hrBpAOgrt8RXigk83LLNE")
-            .then(function (response) {
-                var returnObj = response.album.artists[0];
-                console.log(
-                     returnObj.name + "\n" +
-                    "The Sign" + "\n" + 
-                    response.album.name + "\n" +
-                    response.album.preview_url
-                );
-            })
+        spotify.search({ type: "track", query: "The Sign" })
+        .then(function (response) {
+            var returnObj = response.tracks.items;
+            console.log(
+                returnObj[8].artists[0].name + "\n" +
+                returnObj[8].name + "\n" +
+                returnObj[8].preview_url + "\n" +
+                returnObj[8].album.name
+            );
+        })
             .catch(function (error) {
                 console.log(error);
             })
